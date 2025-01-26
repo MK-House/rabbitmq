@@ -4,7 +4,7 @@ data "null_resource" "check_rabbitmq-data_volume" {
 
 resource "null_resource" "create_rabbitmq_data_volume" {
   provisioner "local-exec" {
-    command = "docker volume create --name ${var.rabbitmq-data_volume_name} --opt type=none --opt device=${var.rabbitmq-data_volume_path} --opt o=bind"
+    command = "docker volume create --name ${var.rabbitmq-data_volume_name} --opt type=none --opt device=${local.rabbitmq_data_volume_path} --opt o=bind"
   }
   depends_on = [null_resource.check_rabbitmq-data_volume]
 }

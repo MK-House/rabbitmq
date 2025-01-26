@@ -38,12 +38,6 @@ variable "rabbitmq-data_volume_name" {
   default     = "mkhouse-rabbitmq-data"
 }
 
-variable "rabbitmq-data_volume_path" {
-  description = "The RabbitMQ data Docker volume"
-  type        = string
-  default     = "${var.mkhouse_volume_basepath}/rabbitmq-data"
-}
-
 variable "docker_compose_file" {
   description = "The path to the docker-compose.yml file"
   type        = string
