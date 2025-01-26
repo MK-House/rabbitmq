@@ -4,7 +4,7 @@ data "external" "check_rabbitmq-data_volume" {
 
 resource "null_resource" "create_rabbitmq_data_directory" {
   provisioner "local-exec" {
-    command = "mkdir -p ${local.rabbitmq_data_volume_path}"
+    command = "sudo mkdir -p ${local.rabbitmq_data_volume_path}"
   }
 }
 
