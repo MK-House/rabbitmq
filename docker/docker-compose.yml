@@ -25,7 +25,7 @@ services:
       - "mkhouse-vpc-net"
 
 networks:
-  mkhouse-rabbit-net:
+  mkhouse-rabbitmq-net:
     external: true
   mkhouse-vpc-net:
     external: true
