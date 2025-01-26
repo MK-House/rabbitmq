@@ -13,7 +13,7 @@ variable "vpc_network_name" {
 variable "rabbitmq_network_name" {
   description = "The RabbitMQ Docker network"
   type        = string
-  default     = "mkhouse-rabbit-net"
+  default     = "mkhouse-rabbitmq-net"
 }
 
 variable "rabbitmq_default_user" {
