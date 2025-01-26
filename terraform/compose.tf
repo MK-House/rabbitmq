@@ -8,7 +8,9 @@ resource "null_resource" "docker_compose_pull" {
   }
   depends_on = [
       null_resource.create_vpc_network,
-      null_resource.create_rabbitmq_network
+      null_resource.create_rabbitmq_network,
+      docker_network.mkhouse_rabbitmq_net,
+      docker_network.mkhouse_vpc_net
     ]
 }
 
