@@ -7,6 +7,7 @@ on:
       - "main"
 
 jobs:
+
   deploy-cloudflared:
     runs-on:
       - "self-hosted"
@@ -27,3 +28,23 @@ jobs:
       - name: "Apply Terraform configuration"
         run: |
           terraform -chdir=./terraform apply -auto-approve
+
+  create-public-dns:
+    runs-on:
+      - "ubuntu-latest"
+    needs:
+      - "deploy-cloudflared"
+    steps:
+      - name: "Create public DNS record"
+        env:
+          CF_TUNNEL_ID: "${{ secrets.CF_TUNNEL_ID }}"
+          CF_ACCOUNT_ID: "${{ secrets.CF_ACCOUNT_ID }}"
+          CF_TUNNEL_API_TOKEN: "${{ secrets.CF_TUNNEL_API_TOKEN }}"
+        run: |
+          curl -X POST "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/cfd_tunnel/${CF_TUNNEL_ID}/dns" \
+            -H "Authorization: Bearer ${CF_TUNNEL_API_TOKEN}" \
+            -H "Content-Type: application/json" \
+            --data '{
+                "hostname": "rabbitmq.mkhouse.net",
+                "service": "http://mkhouse-rabbitmq:15672",
+            }'
