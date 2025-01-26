@@ -1,0 +1,35 @@
+name: "mkhouse-rabbitmq"
+
+services:
+
+  mkhouse-rabbitmq:
+    image: "rabbitmq:3-management"
+    container_name: "mkhouse-rabbitmq"
+    hostname: "mkhouse-rabbitmq"
+    restart: "unless-stopped"
+    dns:
+      - "1.1.1.1"
+      - "4.4.4.4"
+    environment:
+      PUID: "1000"
+      PGID: "1000"
+      TZ: "America/Sao_Paulo"
+      RABBITMQ_DEFAULT_USER: "${RABBITMQ_DEFAULT_USER}"
+      RABBITMQ_DEFAULT_PASS: "${RABBITMQ_DEFAULT_PASS}"
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - "mkhouse-rabbitmq-net"
+      - "mkhouse-vpc-net"
+
+networks:
+  mkhouse-rabbit-net:
+    external: true
+  mkhouse-vpc-net:
+    external: true
+
+volumes:
+  rabbitmq-data:
+    external: true

@@ -1,0 +1,29 @@
+name: "Deploy RabbitMQ"
+run-name: "${{ github.event_name }} by ${{ github.actor }} #${{ github.run_number }}.${{ github.run_attempt }}"
+
+on:
+  push:
+    branches:
+      - "main"
+
+jobs:
+  deploy-cloudflared:
+    runs-on:
+      - "self-hosted"
+      - "tankian"
+    env:
+      TF_VAR_rabbitmq_default_user: "${{ vars.RABBITMQ_DEFAULT_USER }}"
+      TF_VAR_rabbitmq_default_pass: "${{ secrets.RABBITMQ_DEFAULT_PASS }}"
+      TF_VAR_docker_volume_basepath: "${{ vars.DOCKER_VOLUME_BASEPATH }}"
+    steps:
+      - name: "Checkout repository"
+        uses: "actions/checkout@v2"
+      - name: "Initialize Terraform"
+        run: |
+          terraform init -chdir=./terraform
+      - name: "Plan Terraform configuration"
+        run: |
+          terraform plan -chdir=./terraform
+      - name: "Apply Terraform configuration"
+        run: |
+          terraform apply -chdir=./terraform -auto-approve
