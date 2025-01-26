@@ -40,11 +40,19 @@ jobs:
           CF_TUNNEL_ID: "${{ secrets.CF_TUNNEL_ID }}"
           CF_ACCOUNT_ID: "${{ secrets.CF_ACCOUNT_ID }}"
           CF_TUNNEL_API_TOKEN: "${{ secrets.CF_TUNNEL_API_TOKEN }}"
+          CF_ACCOUNT_EMAIL: "${{ secrets.CF_ACCOUNT_EMAIL }}"
         run: |
-          curl -X POST "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/cfd_tunnel/${CF_TUNNEL_ID}/dns" \
-            -H "Authorization: Bearer ${CF_TUNNEL_API_TOKEN}" \
-            -H "Content-Type: application/json" \
-            --data '{
-                "hostname": "rabbitmq.mkhouse.net",
-                "service": "http://mkhouse-rabbitmq:15672",
-            }'
+          curl https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/cfd_tunnel/${CF_TUNNEL_ID}/configurations \
+              -X PUT \
+              -H 'Content-Type: application/json' \
+              -H "X-Auth-Email: ${CF_ACCOUNT_EMAIL}" \
+              -H "X-Auth-Key: ${CF_TUNNEL_API_TOKEN}" \
+              -d '{
+                'ingress': [
+                  {
+                    'hostname': 'rabbitmq.mkhouse.net',
+                    'service': 'http://',
+                    'path': 'mkhouse-rabbitmq:15672',
+                  },
+                ],
+              }'
