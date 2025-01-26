@@ -1,4 +1,4 @@
-data "null_resource" "check_rabbitmq-data_volume" {
+data "external" "check_rabbitmq-data_volume" {
   program = ["bash", "-c", "docker volume inspect ${var.rabbitmq-data_volume_name} >/dev/null 2>&1 && echo '{\"exists\": \"true\"}' || echo '{\"exists\": \"false\"}'"]
 }
 
