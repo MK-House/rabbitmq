@@ -19,7 +19,7 @@ services:
     volumes:
       - "/etc/localtime:/etc/localtime:ro"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - rabbitmq-data:/var/lib/rabbitmq
+      - mkhouse-rabbitmq-data:/var/lib/rabbitmq
     networks:
       - "mkhouse-rabbitmq-net"
       - "mkhouse-vpc-net"
@@ -31,5 +31,5 @@ networks:
     external: true
 
 volumes:
-  rabbitmq-data:
+  mkhouse-rabbitmq-data:
     external: true
