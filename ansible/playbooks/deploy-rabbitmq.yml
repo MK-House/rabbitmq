@@ -272,4 +272,4 @@
             }
           }
       when: |
-        ingress_exists is defined
+        ingress_exists is not defined
