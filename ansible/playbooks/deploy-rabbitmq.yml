@@ -242,16 +242,6 @@
           Content-Type: "application/json"
       register: "cf_tunnel_config"
 
-    - name: "Output Cloudflare Tunnel configuration"
-      debug:
-        var: "cf_tunnel_config"
-
-    - name: "Debug CF_SERVICE and CF_HOSTNAME"
-      debug:
-        msg:
-          - "CF_SERVICE: {{ CF_SERVICE }}"
-          - "CF_HOSTNAME: {{ CF_HOSTNAME }}"
-
     - name: "Set fact if matching ingress exists"
       set_fact:
         ingress_exists: "{{ item }}"
@@ -259,8 +249,27 @@
       when: |
         item.service == CF_SERVICE and item.hostname == CF_HOSTNAME
 
-    - name: "Debug ingress_exists"
-      debug:
-        msg: "Ingress with service {{ CF_SERVICE }} and hostname {{ CF_HOSTNAME }} exists: {{ ingress_exists }}"
+    - name: "Add ingress configuration if it does not exist"
+      uri:
+        url: "https://api.cloudflare.com/client/v4/accounts/{{ CF_ACCOUNT_ID }}/cfd_tunnel/{{ CF_TUNNEL_ID }}"
+        method: "PUT"
+        headers:
+          Authorization: "Bearer {{ CF_TUNNEL_API_TOKEN }}" 
+          Content-Type: "application/json"
+        body_format: "json"
+        body: |
+          {
+            "config": {
+              "ingress": [
+                {% for item in cf_tunnel_config.json.result.config.ingress %}
+                  {{ item }},
+                {% endfor %}
+                {
+                  "service": "{{ CF_SERVICE }}",
+                  "hostname": "{{ CF_HOSTNAME }}"
+                }
+              ]
+            }
+          }
       when: |
         ingress_exists is defined
