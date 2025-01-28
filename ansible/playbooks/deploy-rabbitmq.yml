@@ -4,7 +4,9 @@
   tasks:
     - name: "Group hosts by label"
       group_by:
-        key: "label_{{ hostvars[inventory_hostname]['label'] }}"
+        key: "label_rabbitmq"
+      when: |
+        "rabbitmq" in hostvars[inventory_hostname]["labels"]
 
 - name: "Publish RabbitMQ project to remote nodes"
   hosts: "label_rabbitmq"
