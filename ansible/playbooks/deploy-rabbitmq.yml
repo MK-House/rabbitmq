@@ -1,7 +1,9 @@
 ---
 - name: "Group RabbitMQ hosts"
   hosts: "all"
+
   tasks:
+
     - name: "Group hosts by label"
       group_by:
         key: "label_rabbitmq"
@@ -12,10 +14,12 @@
   hosts: "label_rabbitmq"
   become: true
   any_errors_fatal: true
+
   vars:
     RABBITMQ_PROJECT: "{{ RABBITMQ_PROJECT }}"
 
   tasks:
+
     - name: "Check if project directory exists"
       stat:
         path: "{{ RABBITMQ_PROJECT }}"
@@ -49,10 +53,12 @@
   hosts: "label_rabbitmq"
   become: true
   any_errors_fatal: true
+
   vars:
     RABBITMQ_PROJECT: "{{ RABBITMQ_PROJECT }}"
 
   tasks:
+
     - name: "Ensure destination directory exists"
       file:
         path: "{{ RABBITMQ_PROJECT }}"
@@ -88,7 +94,9 @@
   hosts: "label_rabbitmq"
   become: true
   any_errors_fatal: true
+
   tasks:
+
     - name: "Check if Docker is already installed"
       command: "docker --version"
       register: "docker_installed"
@@ -188,6 +196,7 @@
     RABBITMQ_PROJECT: "{{ RABBITMQ_PROJECT }}"
 
   tasks:
+
     - name: "Remove existing .env file if it exists"
       file:
         path: "{{ RABBITMQ_PROJECT }}/.env"
@@ -232,6 +241,40 @@
       command: |
         docker image prune --force
 
+- name: "Release RabbitMQ"
+  hosts: "label_rabbitmq"
+  become: true
+  any_errors_fatal: true
+  vars:
+    RABBITMQ_PROJECT: "{{ RABBITMQ_PROJECT }}"
+
+  tasks:
+
+    - name: "Get Cloudflare Tunnels"
+      uri:
+        url: |
+          https://api.cloudflare.com/client/v4/accounts/{{ CF_ACCOUNT_ID }}/cfd_tunnel/
+        method: "GET"
+        headers:
+          Authorization: "Bearer {{ CF_TUNNEL_API_TOKEN }}" 
+          Content-Type: "application/json"
+      register: "cf_tunnels"
+
+    - name: "Find tunnel with name equal to CF_TUNNEL_NAME"
+      set_fact:
+        target_tunnel: "{{ item }}"
+      loop: "{{ cf_tunnels.json.result }}"
+      when: |
+        item.name == CF_TUNNEL_NAME
+
+    - name: "Debug target tunnel"
+      debug:
+        var: "target_tunnel"
+
+    - name: "Set CF_TUNNEL_ID from target tunnel"
+      set_fact:
+        CF_TUNNEL_ID: "{{ target_tunnel.id }}"
+
     - name: "Get Cloudflare Tunnel configuration"
       uri:
         url: |
@@ -263,7 +306,7 @@
                   "hostname": "{{ CF_HOSTNAME }}"
                 },
                 {
-                    "service": "http_status:404"
+                  "service": "http_status:404"
                 }
               ]
             }
