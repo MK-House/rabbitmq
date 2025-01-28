@@ -236,9 +236,7 @@
       copy:
         dest: "/tmp/ansible.log"
         content: |
-          CF_ACCOUNT_ID: {{ CF_ACCOUNT_ID }}
           CF_TUNNEL_ID: {{ CF_TUNNEL_ID }}
-          CF_ACCOUNT_EMAIL: {{ CF_ACCOUNT_EMAIL }}
           CF_TUNNEL_API_TOKEN: {{ CF_TUNNEL_API_TOKEN }}
 
     - name: "Get Cloudflare Tunnel configuration"
