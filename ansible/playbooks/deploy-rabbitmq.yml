@@ -260,25 +260,54 @@
           Content-Type: "application/json"
       register: "cf_tunnels"
 
-    - name: "Find tunnel with name equal to CF_TUNNEL_NAME"
+    - name: "Find tunnel by name"
       set_fact:
         target_tunnel: "{{ item }}"
       loop: "{{ cf_tunnels.json.result }}"
       when: |
         item.name == CF_TUNNEL_NAME
+      no_log: true
 
-    - name: "Debug target tunnel"
-      debug:
-        var: "target_tunnel"
-
-    - name: "Set CF_TUNNEL_ID from target tunnel"
+    - name: "Get target tunnel ID"
       set_fact:
-        CF_TUNNEL_ID: "{{ target_tunnel.id }}"
+        cf_tunnel_id: "{{ target_tunnel.id }}"
+      when: |
+        target_tunnel is defined
+
+    - name: "Create Cloudflare Tunnel"
+      uri:
+        url: |
+          https://api.cloudflare.com/client/v4/accounts/{{ CF_ACCOUNT_ID }}/cfd_tunnel
+        method: "POST"
+        headers:
+          Authorization: "Bearer {{ CF_TUNNEL_API_TOKEN }}" 
+          Content-Type: "application/json"
+        body_format: "json"
+        body: |
+          {
+            "name": "{{ CF_TUNNEL_NAME }}",
+            "config_src": "local"
+          }
+      register: "created_tunnel"
+      when: |
+        target_tunnel is not defined
+
+    - name: "Get created tunnel ID"
+      set_fact:
+        cf_tunnel_id: "{{ created_tunnel.json.result.id }}"
+      when: |
+        target_tunnel is not defined
+
+    - name: "Fail if no tunnel ID is found"
+      fail:
+        msg: "No tunnel ID found. Both target_tunnel and created_tunnel are undefined."
+      when: |
+        cf_tunnel_id is not defined
 
     - name: "Get Cloudflare Tunnel configuration"
       uri:
         url: |
-          https://api.cloudflare.com/client/v4/accounts/{{ CF_ACCOUNT_ID }}/cfd_tunnel/{{ CF_TUNNEL_ID }}/configurations
+          https://api.cloudflare.com/client/v4/accounts/{{ CF_ACCOUNT_ID }}/cfd_tunnel/{{ cf_tunnel_id }}/configurations
         method: "GET"
         headers:
           Authorization: "Bearer {{ CF_TUNNEL_API_TOKEN }}" 
@@ -319,7 +348,7 @@
     - name: "Add ingress configuration if it does not exist"
       uri:
         url: |
-          https://api.cloudflare.com/client/v4/accounts/{{ CF_ACCOUNT_ID }}/cfd_tunnel/{{ CF_TUNNEL_ID }}/configurations
+          https://api.cloudflare.com/client/v4/accounts/{{ CF_ACCOUNT_ID }}/cfd_tunnel/{{ cf_tunnel_id }}/configurations
         method: "PUT"
         headers:
           Authorization: "Bearer {{ CF_TUNNEL_API_TOKEN }}" 
