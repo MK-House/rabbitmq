@@ -6,27 +6,31 @@ on:
     branches:
       - "main"
 
-jobs:
+env:
+  ANSIBLE_PROJECT: "${{ vars.ANSIBLE_PROJECT }}"
+  RABBITMQ_PROJECT: "${{ vars.RABBITMQ_PROJECT }}"
+  RABBITMQ_DEFAULT_USER: "${{ vars.RABBITMQ_DEFAULT_USER }}"
+  RABBITMQ_DEFAULT_PASS: "${{ secrets.RABBITMQ_DEFAULT_PASS }}"
 
-  deploy-cloudflared:
+jobs:
+  deploy-rabbitmq:
+    name: "Deploy RabbitMQ"
     runs-on:
       - "self-hosted"
-      - "tankian"
-    env:
-      TF_VAR_rabbitmq_default_user: "${{ vars.RABBITMQ_DEFAULT_USER }}"
-      TF_VAR_rabbitmq_default_pass: "${{ secrets.RABBITMQ_DEFAULT_PASS }}"
-      TF_VAR_docker_volume_basepath: "${{ vars.DOCKER_VOLUME_BASEPATH }}"
-      TF_VAR_cloudflare_api_token: "${{ secrets.CF_TUNNEL_API_TOKEN }}"
-      TF_VAR_cloudflare_account_id: "${{ secrets.CF_ACCOUNT_ID }}"
     steps:
       - name: "Checkout repository"
         uses: "actions/checkout@v2"
-      - name: "Initialize Terraform"
+      - name: "Copy project to dropfolder"
         run: |
-          terraform -chdir=./terraform init
-      - name: "Plan Terraform configuration"
+          sudo rm -rf ${ANSIBLE_PROJECT}/_dropfolder/rabbitmq/*
+          sudo mkdir -p ${ANSIBLE_PROJECT}/_dropfolder/rabbitmq
+          sudo chmod 0755 ${ANSIBLE_PROJECT}/_dropfolder/rabbitmq
+          sudo cp -r ./docker/* ${ANSIBLE_PROJECT}/_dropfolder/rabbitmq/
+      - name: "Run Ansible Playbook"
         run: |
-          terraform -chdir=./terraform plan
-      - name: "Apply Terraform configuration"
-        run: |
-          terraform -chdir=./terraform apply -auto-approve
+          ansible-playbook ./ansible/playbooks/deploy-rabbitmq.yml \
+            -i ${ANSIBLE_PROJECT}/inventory/hosts.ini \
+            -e ANSIBLE_PROJECT=${ANSIBLE_PROJECT} \
+            -e RABBITMQ_PROJECT=${RABBITMQ_PROJECT} \
+            -e RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER} \
+            -e RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}

@@ -21,8 +21,8 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "mkhouse-rabbitmq-data:/var/lib/rabbitmq"
     networks:
-      - "mkhouse-rabbitmq-net"
-      - "mkhouse-vpc-net"
+      mkhouse-rabbitmq-net:
+      mkhouse-vpc-net:
 
 networks:
   mkhouse-rabbitmq-net:
