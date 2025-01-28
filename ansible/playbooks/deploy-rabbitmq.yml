@@ -341,10 +341,6 @@
             }
           }
 
-    - name: "Debug body for adding ingress configuration"
-      debug:
-        msg: "{{ ingress_body }}"
-
     - name: "Add ingress configuration if it does not exist"
       uri:
         url: |
