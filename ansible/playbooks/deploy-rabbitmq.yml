@@ -255,12 +255,15 @@
           {
             "config": {
               "ingress": [
-                {% for item in cf_tunnel_config.json.result.config.ingress %}
+                {% for item in cf_tunnel_config.json.result.config.ingress if item.hostname is defined %}
                   {{ item }},
                 {% endfor %}
                 {
                   "service": "{{ CF_SERVICE }}",
                   "hostname": "{{ CF_HOSTNAME }}"
+                },
+                {
+                    "service": "http_status:404"
                 }
               ]
             }
