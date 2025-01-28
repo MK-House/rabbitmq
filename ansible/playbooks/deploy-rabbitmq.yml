@@ -249,16 +249,9 @@
       when: |
         item.service == CF_SERVICE and item.hostname == CF_HOSTNAME
 
-    - name: "Add ingress configuration if it does not exist"
-      uri:
-        url: |
-          https://api.cloudflare.com/client/v4/accounts/{{ CF_ACCOUNT_ID }}/cfd_tunnel/{{ CF_TUNNEL_ID }}/configurations
-        method: "PUT"
-        headers:
-          Authorization: "Bearer {{ CF_TUNNEL_API_TOKEN }}" 
-          Content-Type: "application/json"
-        body_format: "json"
-        body: |
+    - name: "Generate body for adding ingress configuration"
+      set_fact:
+        ingress_body: |
           {
             "config": {
               "ingress": [
@@ -272,5 +265,21 @@
               ]
             }
           }
+
+    - name: "Debug body for adding ingress configuration"
+      debug:
+        msg: "{{ ingress_body }}"
+
+    - name: "Add ingress configuration if it does not exist"
+      uri:
+        url: |
+          https://api.cloudflare.com/client/v4/accounts/{{ CF_ACCOUNT_ID }}/cfd_tunnel/{{ CF_TUNNEL_ID }}/configurations
+        method: "PUT"
+        headers:
+          Authorization: "Bearer {{ CF_TUNNEL_API_TOKEN }}" 
+          Content-Type: "application/json"
+        body_format: "json"
+        body: |
+          {{ ingress_body }}
       when: |
         ingress_exists is not defined
