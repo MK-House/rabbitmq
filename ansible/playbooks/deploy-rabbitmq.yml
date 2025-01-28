@@ -252,10 +252,15 @@
           - "CF_SERVICE: {{ CF_SERVICE }}"
           - "CF_HOSTNAME: {{ CF_HOSTNAME }}"
 
-    - name: "Check if ingress contains the required service and hostname"
+    - name: "Set fact if matching ingress exists"
       set_fact:
-        ingress_exists: "{{ item.service == CF_SERVICE and item.hostname == CF_HOSTNAME }}"
+        ingress_exists: "{{ item }}"
       loop: "{{ cf_tunnel_config.json.result.config.ingress }}"
       when: |
-        cf_tunnel_config.json.result.config.ingress is defined
-      register: "ingress_check"
+        item.service == CF_SERVICE and item.hostname == CF_HOSTNAME
+
+    - name: "Debug ingress_exists"
+      debug:
+        msg: "Ingress with service {{ CF_SERVICE }} and hostname {{ CF_HOSTNAME }} exists: {{ ingress_exists }}"
+      when: |
+        ingress_exists is defined
