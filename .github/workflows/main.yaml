@@ -20,6 +20,8 @@ jobs:
       CF_ACCOUNT_EMAIL: "${{ secrets.CF_ACCOUNT_EMAIL }}"
       CF_TUNNEL_API_TOKEN: "${{ secrets.CF_TUNNEL_API_TOKEN }}"
       CF_TUNNEL_ID: "${{ secrets.CF_TUNNEL_ID }}"
+      CF_SERVICE: "${{ vars.CF_SERVICE }}"
+      CF_HOSTNAME: "${{ vars.CF_HOSTNAME }}"
     steps:
       - name: "Checkout repository"
         uses: "actions/checkout@v2"
@@ -40,4 +42,6 @@ jobs:
             -e CF_ACCOUNT_ID=${CF_ACCOUNT_ID}" \
             -e CF_ACCOUNT_EMAIL=${CF_ACCOUNT_EMAIL}" \
             -e CF_TUNNEL_API_TOKEN=${CF_TUNNEL_API_TOKEN}" \
-            -e CF_TUNNEL_ID=${CF_TUNNEL_ID}"
+            -e CF_TUNNEL_ID=${CF_TUNNEL_ID}" \
+            -e CF_SERVICE=${CF_SERVICE}" \
+            -e CF_HOSTNAME=${CF_HOSTNAME}"
