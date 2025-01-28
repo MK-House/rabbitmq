@@ -6,17 +6,20 @@ on:
     branches:
       - "main"
 
-env:
-  ANSIBLE_PROJECT: "${{ vars.ANSIBLE_PROJECT }}"
-  RABBITMQ_PROJECT: "${{ vars.RABBITMQ_PROJECT }}"
-  RABBITMQ_DEFAULT_USER: "${{ vars.RABBITMQ_DEFAULT_USER }}"
-  RABBITMQ_DEFAULT_PASS: "${{ secrets.RABBITMQ_DEFAULT_PASS }}"
-
 jobs:
   deploy-rabbitmq:
     name: "Deploy RabbitMQ"
     runs-on:
       - "self-hosted"
+    env:
+      ANSIBLE_PROJECT: "${{ vars.ANSIBLE_PROJECT }}"
+      RABBITMQ_PROJECT: "${{ vars.RABBITMQ_PROJECT }}"
+      RABBITMQ_DEFAULT_USER: "${{ vars.RABBITMQ_DEFAULT_USER }}"
+      RABBITMQ_DEFAULT_PASS: "${{ secrets.RABBITMQ_DEFAULT_PASS }}"
+      CF_ACCOUNT_ID: "${{ secrets.CF_ACCOUNT_ID }}"
+      CF_ACCOUNT_EMAIL: "${{ secrets.CF_ACCOUNT_EMAIL }}"
+      CF_TUNNEL_API_TOKEN: "${{ secrets.CF_TUNNEL_API_TOKEN }}"
+      CF_TUNNEL_ID: "${{ secrets.CF_TUNNEL_ID }}"
     steps:
       - name: "Checkout repository"
         uses: "actions/checkout@v2"
@@ -33,4 +36,8 @@ jobs:
             -e ANSIBLE_PROJECT=${ANSIBLE_PROJECT} \
             -e RABBITMQ_PROJECT=${RABBITMQ_PROJECT} \
             -e RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER} \
-            -e RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
+            -e RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS} \
+            -e CF_ACCOUNT_ID=${CF_ACCOUNT_ID}" \
+            -e CF_ACCOUNT_EMAIL=${CF_ACCOUNT_EMAIL}" \
+            -e CF_TUNNEL_API_TOKEN=${CF_TUNNEL_API_TOKEN}" \
+            -e CF_TUNNEL_ID=${CF_TUNNEL_ID}"
