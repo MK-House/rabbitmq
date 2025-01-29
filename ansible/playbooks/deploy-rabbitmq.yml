@@ -245,112 +245,13 @@
   hosts: "label_rabbitmq"
   become: true
   any_errors_fatal: true
-  vars:
-    RABBITMQ_PROJECT: "{{ RABBITMQ_PROJECT }}"
 
   tasks:
 
-    - name: "Get Cloudflare Tunnels"
-      uri:
-        url: |
-          https://api.cloudflare.com/client/v4/accounts/{{ CF_ACCOUNT_ID }}/cfd_tunnel
-        method: "GET"
-        headers:
-          Authorization: "Bearer {{ CF_TUNNEL_API_TOKEN }}" 
-          Content-Type: "application/json"
-      register: "cf_tunnels"
-
-    - name: "Find tunnel by name"
-      set_fact:
-        target_tunnel: "{{ item }}"
-      loop: "{{ cf_tunnels.json.result }}"
-      when: |
-        item.name == CF_TUNNEL_NAME
-      no_log: true
-
-    - name: "Get target tunnel ID"
-      set_fact:
-        cf_tunnel_id: "{{ target_tunnel.id }}"
-      when: |
-        target_tunnel is defined
-
-    - name: "Create Cloudflare Tunnel"
-      uri:
-        url: |
-          https://api.cloudflare.com/client/v4/accounts/{{ CF_ACCOUNT_ID }}/cfd_tunnel
-        method: "POST"
-        headers:
-          Authorization: "Bearer {{ CF_TUNNEL_API_TOKEN }}" 
-          Content-Type: "application/json"
-        body_format: "json"
-        body: |
-          {
-            "name": "{{ CF_TUNNEL_NAME }}",
-            "config_src": "local"
-          }
-      register: "created_tunnel"
-      when: |
-        target_tunnel is not defined
-
-    - name: "Get created tunnel ID"
-      set_fact:
-        cf_tunnel_id: "{{ created_tunnel.json.result.id }}"
-      when: |
-        target_tunnel is not defined
-
-    - name: "Fail if no tunnel ID is found"
-      fail:
-        msg: "No tunnel ID found. Both target_tunnel and created_tunnel are undefined."
-      when: |
-        cf_tunnel_id is not defined
-
-    - name: "Get Cloudflare Tunnel configuration"
-      uri:
-        url: |
-          https://api.cloudflare.com/client/v4/accounts/{{ CF_ACCOUNT_ID }}/cfd_tunnel/{{ cf_tunnel_id }}/configurations
-        method: "GET"
-        headers:
-          Authorization: "Bearer {{ CF_TUNNEL_API_TOKEN }}" 
-          Content-Type: "application/json"
-      register: "cf_tunnel_config"
-
-    - name: "Set fact if matching ingress exists"
-      set_fact:
-        ingress_exists: "{{ item }}"
-      loop: "{{ cf_tunnel_config.json.result.config.ingress }}"
-      when: |
-        item.service == CF_SERVICE and item.hostname == CF_HOSTNAME
-
-    - name: "Generate body for adding ingress configuration"
-      set_fact:
-        ingress_body: |
-          {
-            "config": {
-              "ingress": [
-                {% for item in cf_tunnel_config.json.result.config.ingress if item.hostname is defined %}
-                  {{ item }},
-                {% endfor %}
-                {
-                  "service": "{{ CF_SERVICE }}",
-                  "hostname": "{{ CF_HOSTNAME }}"
-                },
-                {
-                  "service": "http_status:404"
-                }
-              ]
-            }
-          }
-
-    - name: "Add ingress configuration if it does not exist"
-      uri:
-        url: |
-          https://api.cloudflare.com/client/v4/accounts/{{ CF_ACCOUNT_ID }}/cfd_tunnel/{{ cf_tunnel_id }}/configurations
-        method: "PUT"
-        headers:
-          Authorization: "Bearer {{ CF_TUNNEL_API_TOKEN }}" 
-          Content-Type: "application/json"
-        body_format: "json"
-        body: |
-          {{ ingress_body }}
-      when: |
-        ingress_exists is not defined
+    - name: "Ensure Cloudflared Tunnels"
+      mkhouse.cloudflared.ensure_tunnel:
+        account_id: "{{ CF_ACCOUNT_ID }}"
+        api_token: "{{ CF_TUNNEL_API_TOKEN }}"
+        tunnel_name: "{{ CF_TUNNEL_NAME }}"
+        private_service: "{{ CF_SERVICE }}"
+        public_hostname: "{{ CF_HOSTNAME }}"
