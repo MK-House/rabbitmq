@@ -249,7 +249,7 @@
   tasks:
 
     - name: "Ensure Cloudflared Tunnels"
-      mkhouse.cloudflared.ensure_tunnel:
+      mkh_ensure_cfd_tunnel:
         account_id: "{{ CF_ACCOUNT_ID }}"
         api_token: "{{ CF_TUNNEL_API_TOKEN }}"
         tunnel_name: "{{ CF_TUNNEL_NAME }}"
