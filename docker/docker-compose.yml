@@ -1,4 +1,4 @@
-name: "mkhouse/rabbitmq"
+name: "mkhouse-rabbitmq"
 
 services:
 
