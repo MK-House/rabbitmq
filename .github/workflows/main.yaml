@@ -32,7 +32,15 @@ jobs:
           sudo cp -r ./docker/* ${ANSIBLE_PROJECT}/_dropfolder/rabbitmq/
       - name: "Run Ansible Playbook"
         run: |
+          pwd
+      - name: "Run Ansible Playbook"
+        run: |
           cd ${ANSIBLE_PROJECT}
+      - name: "Run Ansible Playbook"
+        run: |
+          pwd
+      - name: "Run Ansible Playbook"
+        run: |
           ansible-playbook ${GITHUB_WORKSPACE}/ansible/playbooks/deploy-rabbitmq.yml \
             -i ./inventory/hosts.ini \
             -e ANSIBLE_PROJECT=${ANSIBLE_PROJECT} \
