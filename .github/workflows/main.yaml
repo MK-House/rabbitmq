@@ -17,10 +17,8 @@ jobs:
       RABBITMQ_DEFAULT_USER: "${{ vars.RABBITMQ_DEFAULT_USER }}"
       RABBITMQ_DEFAULT_PASS: "${{ secrets.RABBITMQ_DEFAULT_PASS }}"
       CF_ACCOUNT_ID: "${{ secrets.CF_ACCOUNT_ID }}"
-      CF_ACCOUNT_EMAIL: "${{ secrets.CF_ACCOUNT_EMAIL }}"
       CF_TUNNEL_API_TOKEN: "${{ secrets.CF_TUNNEL_API_TOKEN }}"
       CF_TUNNEL_NAME: "${{ vars.CF_TUNNEL_NAME }}"
-      CF_TUNNEL_ID: "${{ secrets.CF_TUNNEL_ID }}"
       CF_SERVICE: "${{ vars.CF_SERVICE }}"
       CF_HOSTNAME: "${{ vars.CF_HOSTNAME }}"
     steps:
@@ -34,15 +32,16 @@ jobs:
           sudo cp -r ./docker/* ${ANSIBLE_PROJECT}/_dropfolder/rabbitmq/
       - name: "Run Ansible Playbook"
         run: |
-          ansible-playbook ./ansible/playbooks/deploy-rabbitmq.yml \
-            -i ${ANSIBLE_PROJECT}/inventory/hosts.ini \
+          cd ${ANSIBLE_PROJECT}
+          ansible-playbook ${GITHUB_WORKSPACE}/ansible/playbooks/deploy-rabbitmq.yml \
+            -i ./inventory/hosts.ini \
             -e ANSIBLE_PROJECT=${ANSIBLE_PROJECT} \
             -e RABBITMQ_PROJECT=${RABBITMQ_PROJECT} \
             -e RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER} \
             -e RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS} \
-            -e CF_ACCOUNT_ID=${CF_ACCOUNT_ID}" \
-            -e CF_ACCOUNT_EMAIL=${CF_ACCOUNT_EMAIL}" \
-            -e CF_TUNNEL_API_TOKEN=${CF_TUNNEL_API_TOKEN}" \
-            -e CF_TUNNEL_NAME=${CF_TUNNEL_NAME}" \
-            -e CF_SERVICE=${CF_SERVICE}" \
-            -e CF_HOSTNAME=${CF_HOSTNAME}"
+            -e CF_ACCOUNT_ID=${CF_ACCOUNT_ID} \
+            -e CF_ACCOUNT_EMAIL=${CF_ACCOUNT_EMAIL} \
+            -e CF_TUNNEL_API_TOKEN=${CF_TUNNEL_API_TOKEN} \
+            -e CF_TUNNEL_NAME=${CF_TUNNEL_NAME} \
+            -e CF_SERVICE=${CF_SERVICE} \
+            -e CF_HOSTNAME=${CF_HOSTNAME}
