@@ -33,13 +33,6 @@ jobs:
       - name: "Run Ansible Playbook"
         run: |
           cd ${ANSIBLE_PROJECT}
-          pwd
-      - name: "Run Ansible Playbook"
-        run: |
-          pwd
-          cd ${ANSIBLE_PROJECT}
-          pwd
-          ls ./library
           ansible-playbook ${GITHUB_WORKSPACE}/ansible/playbooks/deploy-rabbitmq.yml \
             -i ./inventory/hosts.ini \
             -e ANSIBLE_PROJECT=${ANSIBLE_PROJECT} \
