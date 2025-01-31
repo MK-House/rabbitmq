@@ -217,6 +217,11 @@
       mkh_ensure_docker_network:
         name: "mkhouse-vpc-net"
 
+    - name: "Ensure mkhouse-rabbitmq-data Docker volume exists and meets expectations"
+      mkh_ensure_docker_volume:
+        name: "mkhouse-rabbitmq-data"
+        path: "/mkh/srv/mkhouse/rabbitmq-data"
+
     - name: "Pull Docker Compose services"
       command: |
         docker compose pull
