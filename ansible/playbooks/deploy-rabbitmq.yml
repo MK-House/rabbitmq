@@ -220,7 +220,11 @@
     - name: "Ensure mkhouse-rabbitmq-data Docker volume expectations"
       mkh_ensure_docker_volume:
         name: "mkhouse-rabbitmq-data"
-        path: "/mkh/srv/mkhouse/rabbitmq-data"
+        device:
+          path: "/mkh/srv/mkhouse/rabbitmq-data"
+          permissions: '0755'
+          puid: '1000'
+          pgid: '1000'
 
     - name: "Pull Docker Compose services"
       command: |
