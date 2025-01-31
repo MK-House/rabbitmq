@@ -40,7 +40,6 @@ jobs:
             -e RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER} \
             -e RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS} \
             -e CF_ACCOUNT_ID=${CF_ACCOUNT_ID} \
-            -e CF_ACCOUNT_EMAIL=${CF_ACCOUNT_EMAIL} \
             -e CF_TUNNEL_API_TOKEN=${CF_TUNNEL_API_TOKEN} \
             -e CF_TUNNEL_NAME=${CF_TUNNEL_NAME} \
             -e CF_SERVICE=${CF_SERVICE} \
