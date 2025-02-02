@@ -213,18 +213,20 @@
       when: |
         hostvars[inventory_hostname].CF_TUNNEL_TOKEN is defined
 
-    - name: "Ensure mkhouse-vpc-net Docker network exists"
+    - name: "Ensure Docker networks exist"
       mkh_ensure_docker_network:
-        name: "mkhouse-vpc-net"
+        networks:
+          - name: "mkhouse-vpc-net"
 
-    - name: "Ensure mkhouse-rabbitmq-data Docker volume expectations"
+    - name: "Ensure Docker volumes meet expectations"
       mkh_ensure_docker_volume:
-        name: "mkhouse-rabbitmq-data"
-        device:
-          path: "/mkh/srv/mkhouse/rabbitmq-data"
-          permissions: '0755'
-          puid: '1000'
-          pgid: '1000'
+        volumes:
+          - name: "mkhouse-rabbitmq-data"
+            device:
+              path: "/mkh/srv/mkhouse/rabbitmq-data"
+              permissions: '0755'
+              puid: '1000'
+              pgid: '1000'
 
     - name: "Pull Docker Compose services"
       command: |
