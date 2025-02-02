@@ -254,5 +254,6 @@
         account_id: "{{ CF_ACCOUNT_ID }}"
         api_token: "{{ CF_TUNNEL_API_TOKEN }}"
         tunnel_name: "{{ CF_TUNNEL_NAME }}"
+        zone_id: "{{ CF_ZONE_ID }}"
         private_service: "{{ CF_SERVICE }}"
         public_hostname: "{{ CF_HOSTNAME }}"
